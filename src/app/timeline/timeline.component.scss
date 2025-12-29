@@ -1,0 +1,218 @@
+.timeline {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	background: #ffffff;
+	font-family: 'Circular-Std';
+	padding-left: 101px;
+	padding-right: 45px;
+
+	.timeline-header {
+		margin: 0;
+		height: 50px;
+		display: flex;
+		align-items: center;
+
+		h1 {
+			margin: 0;
+			font-size: 16px;
+			font-weight: 600;
+		}
+	}
+
+	.timeline-main {
+		flex: 1;
+		padding-top: 45px;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		width: 100%;
+		min-width: 0;
+
+		h2 {
+			color: rgba(3, 9, 41, 1);
+			font-family: 'Circular-Std';
+			font-size: 24px;
+			font-weight: 500;
+			margin: 0;
+		}
+
+		.timeline-filters {
+			display: flex;
+			flex-direction: row;
+			height: 25px;
+			padding: 24px 0;
+
+			span {
+				color: rgba(104, 113, 150, 1);
+				font-family: 'Circular-Std';
+				font-size: 13px;
+				font-weight: 400;
+				line-height: 16px;
+				background-color: rgba(241, 243, 248, 0.75);
+				border-radius: 5px 0px 0px 5px;
+				padding: 0 8px;
+				display: flex;
+				align-items: center;
+				box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
+			}
+
+			select {
+				padding: 6px 12px;
+				font-size: 13px;
+				font-weight: 500;
+				font-family: 'Circular-Std';
+				color: rgba(62, 64, 219, 1);
+				background: #ffffff;
+				cursor: pointer;
+				transition: all 0.15s ease;
+				appearance: none;
+				background-image: url('../../assets/icons/caret-down-icon.svg');
+				background-repeat: no-repeat;
+				background-position: right 8px center;
+				padding: 0 23px 0 8px;
+				border-radius: 0px 5px 5px 0px;
+				padding-top: 0;
+				padding-bottom: 0;
+				border: none;
+				box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
+
+				&:hover {
+					border-color: #9ca3af;
+				}
+
+				&:focus {
+					outline: none;
+				}
+			}
+		}
+
+		.timeline-section {
+			display: flex;
+			flex-direction: row;
+			flex: 1;
+			overflow: hidden;
+			width: 100%;
+			min-width: 0;
+
+			.timeline-section-header {
+				height: 32px;
+				// border-bottom: rgba(230, 235, 240, 1) 1px solid;
+				display: flex;
+				align-items: center;
+				padding-left: 31px;
+				color: rgba(104, 113, 150, 1);
+				font-family: 'Circular-Std';
+				font-size: 14px;
+				font-weight: 500;
+			}
+
+			.timeline-work-center {
+				width: 380px;
+				border: rgba(230, 235, 240, 1) 1px solid;
+
+				.timeline-section-content {
+					height: 48px;
+					border-top: rgba(230, 235, 240, 1) 1px solid;
+					padding-left: 31px;
+					display: flex;
+					align-items: center;
+					cursor: pointer;
+
+					&:hover {
+						background-color: rgba(250, 251, 253, 1);
+						border-top: none;
+					}
+
+					&:last-child {
+						border-bottom: rgba(230, 235, 240, 1) 1px solid;
+					}
+				}
+			}
+
+			.timeline-grid {
+				flex: 1;
+				min-width: 0;
+				border: rgba(230, 235, 240, 1) 1px solid;
+				border-left: none;
+
+				.grid-items {
+					display: flex;
+					gap: 0;
+
+					.grid-item {
+						flex: 1;
+						min-width: 60px;
+						text-align: center;
+						font-size: 12px;
+						white-space: nowrap;
+						border-right: rgba(230, 235, 240, 1) 1px solid;
+
+						&:last-child {
+							border-right: none;
+						}
+
+						&.is-today {
+							color: rgba(62, 64, 219, 1);
+							font-weight: 600;
+						}
+					}
+				}
+
+				.timeline-grid-content {
+					height: calc(100% - 32px);
+					background-color: rgba(247, 249, 252, 1);
+
+					.timeline-grid-content-row {
+						height: 48px;
+						display: flex;
+						align-items: center;
+						cursor: pointer;
+
+						.timeline-grid-content-row-item {
+							height: 38px;
+							box-shadow: rgba(222, 224, 255, 1) 0 0 0 1px;
+							border-radius: 8px;
+							background-color: rgba(237, 238, 255, 1);
+							display: flex;
+							align-items: center;
+							justify-content: space-between;
+							gap: 10px;
+							padding: 0 8px;
+
+							.title {
+								color: rgba(3, 9, 41, 1);
+								font-size: 14px;
+								font-weight: 400;
+							}
+
+							.status {
+								padding: 2px 8px;
+								border-radius: 5px;
+								color: rgba(62, 64, 219, 1);
+								background-color: rgba(214, 216, 255, 1);
+							}
+
+							.more-icon {
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								width: 24px;
+								height: 22px;
+								border-radius: 5px;
+								background-color: rgba(241, 243, 248, 1);
+								opacity: 0;
+								pointer-events: none;
+							}
+
+							&:hover .more-icon {
+								opacity: 1;
+								pointer-events: auto;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

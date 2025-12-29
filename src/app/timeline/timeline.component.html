@@ -1,0 +1,56 @@
+<div class="timeline">
+	<header class="timeline-header">
+		<img src="assets/icons/naologic-logo.svg" alt="Naologic" class="timeline-header-logo" />
+	</header>
+
+	<main class="timeline-main">
+		<h2>Work Orders</h2>
+
+		<div class="timeline-filters">
+			<span>Timescale</span>
+			<select [ngModel]="state.zoomLevel" (ngModelChange)="onZoomChange($event)">
+				<option value="day">Day</option>
+				<option value="week">Week</option>
+				<option value="month">Month</option>
+			</select>
+		</div>
+
+		<div class="timeline-section">
+			<div class="timeline-work-center">
+				<div class="timeline-section-header">Work Center</div>
+
+				<div class="timeline-section-content">Genesis Hardware</div>
+
+				<div class="timeline-section-content">Rodriques Electrics</div>
+			</div>
+
+			<div class="timeline-grid">
+				<div class="timeline-section-header grid-items">
+					@for (unit of headerUnits; track unit.label) {
+						<span class="grid-item" [class.is-today]="unit.isToday">
+							{{ unit.label }}
+						</span>
+					}
+				</div>
+
+				<div class="timeline-grid-content">
+					<div class="timeline-grid-content-row">
+						<div class="timeline-grid-content-row-item">
+							<span class="title">Konsulting Inc</span>
+							<span class="status">In progress</span>
+							<span class="more-icon">
+								<img src="assets/icons/more-icon.svg" alt="Dots" class="dots-icon" />
+								<img src="assets/icons/more-icon.svg" alt="Dots" class="dots-icon" />
+								<img src="assets/icons/more-icon.svg" alt="Dots" class="dots-icon" />
+							</span>
+						</div>
+					</div>
+
+					<div class="timeline-grid-content-item">
+                        
+                    </div>
+				</div>
+			</div>
+		</div>
+	</main>
+</div>
