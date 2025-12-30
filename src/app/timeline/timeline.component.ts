@@ -1,6 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TimelineState, ZoomLevel, TimelineHeaderUnit } from '../models/timeline-state.models';
+import {
+	TimelineState,
+	ZoomLevel,
+	TimelineHeaderUnit,
+	PositionedWorkOrder,
+	WorkCenterRow,
+	STATUS_LABELS,
+} from '../models/timeline-state.models';
+import { WORK_CENTERS, WORK_ORDERS } from '../data/timeline-data';
+import { WorkCenterDocument, WorkOrderDocument } from '../models/work-order.models';
 
 @Component({
 	selector: 'app-timeline',
@@ -9,33 +18,40 @@ import { TimelineState, ZoomLevel, TimelineHeaderUnit } from '../models/timeline
 	templateUrl: './timeline.component.html',
 	styleUrl: './timeline.component.scss',
 })
-export class TimelineComponent implements OnInit {
-	state: TimelineState;
-	headerUnits: TimelineHeaderUnit[] = [];
+export class TimelineComponent {
+	statusLabels = STATUS_LABELS;
 
-	constructor() {
+	// Core signals
+	workCenters = signal<WorkCenterDocument[]>(WORK_CENTERS);
+	workOrders = signal<WorkOrderDocument[]>(WORK_ORDERS);
+	timelineState = signal<TimelineState>(this.createInitialState());
+
+	// Computed: header units based on zoom level
+	headerUnits = computed(() => this.generateHeaderUnits(this.timelineState()));
+
+	// Computed: positioned work orders grouped by work center
+	workCenterRows = computed(() => this.calculateWorkCenterRows());
+
+	private createInitialState(): TimelineState {
 		const today = new Date();
 		today.setHours(0, 0, 0, 0);
 
-		this.state = {
+		const start = new Date(today);
+		const end = new Date(today);
+		start.setDate(today.getDate() - 14);
+		end.setDate(today.getDate() + 14);
+
+		return {
 			zoomLevel: 'day',
 			today,
-			visibleStartDate: today,
-			visibleEndDate: today,
+			visibleStartDate: start,
+			visibleEndDate: end,
 		};
 	}
 
-	ngOnInit(): void {
-		this.updateVisibleRange();
-	}
-
 	onZoomChange(zoomLevel: ZoomLevel): void {
-		this.state.zoomLevel = zoomLevel;
-		this.updateVisibleRange();
-	}
-
-	private updateVisibleRange(): void {
-		const { zoomLevel, today } = this.state;
+		const current = this.timelineState();
+		const { today } = current;
 		const start = new Date(today);
 		const end = new Date(today);
 
@@ -54,13 +70,16 @@ export class TimelineComponent implements OnInit {
 				break;
 		}
 
-		this.state.visibleStartDate = start;
-		this.state.visibleEndDate = end;
-		this.generateHeaderUnits();
+		this.timelineState.set({
+			...current,
+			zoomLevel,
+			visibleStartDate: start,
+			visibleEndDate: end,
+		});
 	}
 
-	private generateHeaderUnits(): void {
-		const { zoomLevel, visibleStartDate, visibleEndDate, today } = this.state;
+	private generateHeaderUnits(state: TimelineState): TimelineHeaderUnit[] {
+		const { zoomLevel, visibleStartDate, visibleEndDate, today } = state;
 		const units: TimelineHeaderUnit[] = [];
 		const current = new Date(visibleStartDate);
 
@@ -95,7 +114,46 @@ export class TimelineComponent implements OnInit {
 			}
 		}
 
-		this.headerUnits = units;
+		return units;
+	}
+
+	private calculateWorkCenterRows(): WorkCenterRow[] {
+		const state = this.timelineState();
+		const centers = this.workCenters();
+		const orders = this.workOrders();
+		const totalDays = this.daysBetween(state.visibleStartDate, state.visibleEndDate);
+
+		return centers.map((wc) => {
+			const wcOrders = orders
+				.filter((wo) => wo.workCenterId === wc.id)
+				.map((wo) => this.positionWorkOrder(wo, state.visibleStartDate, totalDays));
+
+			return {
+				id: wc.id,
+				name: wc.name,
+				orders: wcOrders,
+			};
+		});
+	}
+
+	private positionWorkOrder(order: WorkOrderDocument, rangeStart: Date, totalDays: number): PositionedWorkOrder {
+		const orderStart = this.parseDate(order.startDate);
+		const orderEnd = this.parseDate(order.endDate);
+
+		const startOffset = this.daysBetween(rangeStart, orderStart);
+		const duration = this.daysBetween(orderStart, orderEnd) + 1;
+
+		const left = (startOffset / totalDays) * 100;
+		const width = (duration / totalDays) * 100;
+
+		const visible = left + width > 0 && left < 100;
+
+		return {
+			workOrder: order,
+			left: Math.max(0, left),
+			width: Math.min(width, 100 - Math.max(0, left)),
+			visible,
+		};
 	}
 
 	private formatDayLabel(date: Date): string {
@@ -130,5 +188,15 @@ export class TimelineComponent implements OnInit {
 
 	private isSameMonth(a: Date, b: Date): boolean {
 		return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
+	}
+
+	private parseDate(dateStr: string): Date {
+		const [year, month, day] = dateStr.split('-').map(Number);
+		return new Date(year, month - 1, day);
+	}
+
+	private daysBetween(start: Date, end: Date): number {
+		const msPerDay = 24 * 60 * 60 * 1000;
+		return Math.round((end.getTime() - start.getTime()) / msPerDay);
 	}
 }

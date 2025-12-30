@@ -8,7 +8,7 @@
 
 		<div class="timeline-filters">
 			<span>Timescale</span>
-			<select [ngModel]="state.zoomLevel" (ngModelChange)="onZoomChange($event)">
+			<select [ngModel]="timelineState().zoomLevel" (ngModelChange)="onZoomChange($event)">
 				<option value="day">Day</option>
 				<option value="week">Week</option>
 				<option value="month">Month</option>
@@ -19,14 +19,14 @@
 			<div class="timeline-work-center">
 				<div class="timeline-section-header">Work Center</div>
 
-				<div class="timeline-section-content">Genesis Hardware</div>
-
-				<div class="timeline-section-content">Rodriques Electrics</div>
+				@for (row of workCenterRows(); track row.id) {
+					<div class="timeline-section-content">{{ row.name }}</div>
+				}
 			</div>
 
 			<div class="timeline-grid">
 				<div class="timeline-section-header grid-items">
-					@for (unit of headerUnits; track unit.label) {
+					@for (unit of headerUnits(); track unit.label) {
 						<span class="grid-item" [class.is-today]="unit.isToday">
 							{{ unit.label }}
 						</span>
@@ -34,21 +34,30 @@
 				</div>
 
 				<div class="timeline-grid-content">
-					<div class="timeline-grid-content-row">
-						<div class="timeline-grid-content-row-item">
-							<span class="title">Konsulting Inc</span>
-							<span class="status">In progress</span>
-							<span class="more-icon">
-								<img src="assets/icons/more-icon.svg" alt="Dots" class="dots-icon" />
-								<img src="assets/icons/more-icon.svg" alt="Dots" class="dots-icon" />
-								<img src="assets/icons/more-icon.svg" alt="Dots" class="dots-icon" />
-							</span>
-						</div>
+					<div class="grid-columns">
+						@for (unit of headerUnits(); track unit.label) {
+							<div class="grid-column"></div>
+						}
 					</div>
 
-					<div class="timeline-grid-content-item">
-                        
-                    </div>
+					@for (row of workCenterRows(); track row.id) {
+						<div class="timeline-grid-content-row">
+							@for (positioned of row.orders; track positioned.workOrder.id) {
+								@if (positioned.visible) {
+									<div
+										class="timeline-grid-content-row-item"
+										[style.left.%]="positioned.left"
+										[style.width.%]="positioned.width">
+										<span class="title">{{ positioned.workOrder.title }}</span>
+										<span class="status">{{ statusLabels[positioned.workOrder.status] }}</span>
+										<span class="more-icon">
+											<img src="assets/icons/more-icon.svg" alt="Dots" class="dots-icon" />
+										</span>
+									</div>
+								}
+							}
+						</div>
+					}
 				</div>
 			</div>
 		</div>
